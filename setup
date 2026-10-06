@@ -4,7 +4,7 @@ set -euo pipefail
 
 ROOT=$(cd "$(dirname "$0")" && pwd)
 BUNDLED_SITES=$ROOT/sites
-USER_SITES=${XDG_CONFIG_HOME:-$HOME/.config}/web-themes/sites
+USER_SITES=${XDG_CONFIG_HOME:-$HOME/.config}/webthemes/sites
 THEME=${WEB_THEMES_THEME:-$HOME/.themes/current}
 TPL=$ROOT/themed/colors.css.tpl
 

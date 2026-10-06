@@ -20,4 +20,4 @@ sites/github/
   style.css
 ```
 
-Your own packages can live in `~/.config/web-themes/sites/<id>/`. They override a bundled package with the same id.
+Your own packages can live in `~/.config/webthemes/sites/<id>/`. They override a bundled package with the same id.
