@@ -1,24 +1,45 @@
 {
-  "schemaVersion": 1,
-  "id": "evo.webtheme",
-  "name": "Webtheme",
+  "manifest_version": 3,
+  "name": "Web Themes",
   "version": "1.0.0",
-  "author": "seb",
-  "description": "Omarchy theme CSS for Brave and Chromium sites",
-  "kinds": [
-    "service",
-    "bar-widget"
-  ],
-  "keepLoaded": true,
-  "entryPoints": {
-    "service": "Service.qml",
-    "barWidget": "BarWidget.qml"
+  "description": "Restyle sites with the current desktop theme.",
+  "permissions": ["activeTab", "tabs", "scripting", "storage"],
+  "icons": {
+    "16": "icon.png",
+    "48": "icon.png",
+    "128": "icon.png"
   },
-  "barWidget": {
-    "displayName": "Webtheme",
-    "description": "Site CSS packages for Brave and Chromium",
-    "category": "Appearance",
-    "allowMultiple": false,
-    "defaultSection": "right"
-  }
+  "action": {
+    "default_title": "Web Themes",
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icon.png",
+      "48": "icon.png",
+      "128": "icon.png"
+    }
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["match.js", "content.js"],
+      "run_at": "document_start",
+      "all_frames": true
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "catalog.json",
+        "revision",
+        "enabled",
+        "theme.json",
+        "colors.css",
+        "sites/*"
+      ],
+      "matches": ["<all_urls>"]
+    }
+  ]
 }

@@ -1,8 +1,8 @@
 (function () {
   "use strict";
 
-  const STYLE_ID = "omarchy-webtheme-style";
-  const match = globalThis.omarchyWebthemeMatch || {};
+  const STYLE_ID = "web-themes-style";
+  const match = globalThis.webThemesMatch || {};
   const siteForHost = match.siteForHost;
 
   let lastKey = "";
@@ -134,7 +134,7 @@
         });
       })
       .catch((err) => {
-        console.warn("omarchy webtheme:", err && err.message ? err.message : err);
+        console.warn("web themes:", err && err.message ? err.message : err);
       });
   }
 
@@ -151,7 +151,7 @@
   }
 
   chrome.runtime.onMessage.addListener((msg) => {
-    if (!msg || msg.type !== "omarchy-webtheme-reload") return;
+    if (!msg || msg.type !== "web-themes-reload") return;
     if (typeof msg.css === "string") {
       applyPayload(msg.css, msg.key || String(Date.now()));
       return;

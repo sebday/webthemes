@@ -20,7 +20,7 @@ const statTotal = document.getElementById("stat-total");
 let tabUrl = "";
 let tabTitle = "";
 let tabHost = "";
-let desktopTheme = "Omarchy";
+let desktopTheme = "Desktop";
 let currentSite = null;
 
 WebthemeUI.injectColors();
@@ -166,7 +166,7 @@ themeBtn.addEventListener("click", async () => {
   const reply = await WebthemeUI.call({ type: "theme-site", url: tabUrl, title: tabTitle });
   themeBtn.disabled = false;
   if (!reply || reply.ok === false) {
-    showError((reply && reply.error) || "Could not launch the agent");
+    showError((reply && reply.error) || "Could not theme this site");
     return;
   }
   await load();

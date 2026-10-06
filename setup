@@ -1,0 +1,221 @@
+#!/usr/bin/env bash
+# Assemble catalog and theme CSS, then load this folder as an unpacked extension.
+set -euo pipefail
+
+ROOT=$(cd "$(dirname "$0")" && pwd)
+BUNDLED_SITES=$ROOT/sites
+USER_SITES=${XDG_CONFIG_HOME:-$HOME/.config}/web-themes/sites
+THEME=${WEB_THEMES_THEME:-$HOME/.themes/current}
+TPL=$ROOT/themed/colors.css.tpl
+
+fail() {
+  printf 'web-themes: %s\n' "$*" >&2
+  exit 1
+}
+
+command -v jq >/dev/null || fail "jq is required"
+
+mix_hex() {
+  local a=${1#\#} b=${2#\#} t=$3 i out=
+  for i in 0 2 4; do
+    out+=$(printf '%02x' $(( (16#${a:i:2} * (100 - t) + 16#${b:i:2} * t) / 100 )))
+  done
+  printf '#%s' "$out"
+}
+
+render_colors_css() {
+  local toml=$THEME/colors.toml key value bg fg
+  [[ -f $toml && -f $TPL ]] || return 1
+  local -A c=()
+  while IFS='=' read -r key value; do
+    key=${key//[\"\' ]/}
+    [[ $key && $key != \#* ]] || continue
+    value=${value#*[\"\']}
+    value=${value%%[\"\']*}
+    [[ $value =~ ^#[0-9A-Fa-f]{6}$ ]] || continue
+    c[$key]=$value
+  done <"$toml"
+  bg=${c[background]:-#1e1e2e}
+  fg=${c[foreground]:-#cdd6f4}
+  c[background]=$bg
+  c[foreground]=$fg
+  : "${c[accent]:=${c[color4]:-$fg}}"
+  : "${c[lighter_background]:=${c[color0]:-$(mix_hex "$bg" "$fg" 12)}}"
+  : "${c[dark_background]:=${c[mantle]:-$(mix_hex "$bg" "#000000" 25)}}"
+  : "${c[dark_foreground]:=$(mix_hex "$bg" "$fg" 60)}"
+  : "${c[bright_foreground]:=${c[color15]:-$fg}}"
+  : "${c[muted]:=$(mix_hex "$bg" "$fg" 35)}"
+  : "${c[selection]:=$(mix_hex "$bg" "$fg" 20)}"
+  local script=
+  for key in "${!c[@]}"; do
+    script+="s|{{ ${key} }}|${c[$key]}|g;"
+  done
+  sed -e "$script" "$TPL"
+}
+
+load_package() {
+  local dir=$1 source=$2
+  local manifest=$dir/site.json
+  [[ -f $manifest ]] || return 1
+  local css_path=
+  [[ -f $dir/style.css ]] && css_path=$dir/style.css
+  jq -c --arg source "$source" --arg dir "$dir" --arg cssPath "$css_path" --arg fallbackId "$(basename "$dir")" '
+    def tokens:
+      if . == null then empty
+      elif type == "array" then .[]
+      elif type == "string" then (gsub("[\t\n,]+"; " ") | split(" ")[] )
+      else empty end;
+    def parse_matches:
+      [ tokens | select(. != "")
+        | if test("^https?://") then
+            if contains("*") then . else (sub("/$";"") + "/*") end
+          elif test("^[A-Za-z0-9.-]+$") then
+            "https://\(.)/*"
+          else
+            error("invalid match pattern: \(.)")
+          end
+      ];
+    . as $m
+    | ($m.id // $fallbackId) as $id
+    | if ($id | test("^[A-Za-z0-9][A-Za-z0-9._-]*$") | not) then
+        error("invalid site id \($id)")
+      else . end
+    | {
+        id: $id,
+        name: ($m.name // $id),
+        matches: ($m.matches | parse_matches),
+        enabled: (.enabled != false),
+        source: $source,
+        dir: $dir,
+        cssPath: (if $cssPath == "" then null else $cssPath end)
+      }
+  ' "$manifest"
+}
+
+scan_sites() {
+  local root=$1 source=$2 dir
+  [[ -d $root ]] || return 0
+  shopt -s nullglob
+  for dir in "$root"/*/; do
+    load_package "${dir%/}" "$source" || true
+  done
+}
+
+assemble() {
+  local bundled user sites site id css_path css_name catalog_json
+  bundled=$(scan_sites "$BUNDLED_SITES" bundled | jq -s 'map({key:.id, value:.}) | from_entries')
+  user=$(scan_sites "$USER_SITES" user | jq -s 'map({key:.id, value:.}) | from_entries')
+  sites=$(jq -n --argjson bundled "$bundled" --argjson user "$user" '
+    reduce ($user | to_entries[]) as $u ($bundled;
+      if has($u.key) then
+        .[$u.key] |= (
+          .name = (if $u.value.name == "" then .name else $u.value.name end)
+          | .matches = (if ($u.value.matches | length) > 0 then $u.value.matches else .matches end)
+          | .enabled = $u.value.enabled
+          | if $u.value.cssPath != null then
+              .cssPath = $u.value.cssPath | .source = "override"
+            else
+              .source = "bundled"
+            end
+          | .dir = $u.value.dir
+        )
+      else
+        .[$u.key] = $u.value
+      end
+    )
+    | [.[]]
+    | sort_by(.name | ascii_downcase)
+  ')
+  catalog_json='[]'
+  while IFS= read -r site; do
+    [[ -n $site ]] || continue
+    id=$(jq -r '.id' <<<"$site")
+    css_path=$(jq -r '.cssPath // empty' <<<"$site")
+    [[ -n $css_path && -f $css_path ]] || continue
+    css_name=sites/$id/style.css
+    if [[ $css_path != $ROOT/$css_name ]]; then
+      mkdir -p "$ROOT/sites/$id"
+      cp -f "$css_path" "$ROOT/sites/$id/style.css"
+      if [[ ! -f $ROOT/sites/$id/site.json ]]; then
+        jq '{id, name, matches, enabled}' <<<"$site" >"$ROOT/sites/$id/site.json"
+      fi
+    fi
+    catalog_json=$(jq --argjson site "$site" --arg css "$css_name" '
+      . + [{id: $site.id, name: $site.name, matches: $site.matches, enabled: $site.enabled, css: $css, source: $site.source}]
+    ' <<<"$catalog_json")
+  done < <(jq -c '.[]' <<<"$sites")
+
+  jq -n --argjson sites "$catalog_json" '{enabled: true, sites: $sites}' >"$ROOT/catalog.json"
+  printf 'true\n' >"$ROOT/enabled"
+  date +%s >"$ROOT/revision"
+
+  local css name slug
+  if css=$(render_colors_css); then
+    printf '%s\n' "$css" >"$ROOT/colors.css"
+  elif [[ -f $THEME/colors.css ]]; then
+    cp -f "$THEME/colors.css" "$ROOT/colors.css"
+  else
+    fail "no theme colours in $THEME"
+  fi
+  slug=$(tr -d '\n' <"$THEME/.theme-name" 2>/dev/null || true)
+  [[ -n $slug ]] || slug=desktop
+  name=$(printf '%s' "$slug" | sed -E 's/(^|-)([a-z])/\1\u\2/g; s/-/ /g')
+  jq -n --arg name "$name" '{name:$name}' >"$ROOT/theme.json"
+  jq -r '.sites | length' "$ROOT/catalog.json"
+}
+
+ensure_flags_file() {
+  local file=$1 ext=$2
+  [[ -f $file ]] || return 1
+  local tmp found=0 changed=0 line rest
+  tmp=$(mktemp)
+  while IFS= read -r line || [[ -n $line ]]; do
+    if [[ $line == --load-extension=* ]]; then
+      found=1
+      rest=${line#--load-extension=}
+      if [[ ,$rest, == *,$ext,* ]]; then
+        printf '%s\n' "$line" >>"$tmp"
+      else
+        printf '%s\n' "--load-extension=${rest:+$rest,}$ext" >>"$tmp"
+        changed=1
+      fi
+    else
+      printf '%s\n' "$line" >>"$tmp"
+    fi
+  done <"$file"
+  if (( ! found )); then
+    printf '%s\n' "--load-extension=$ext" >>"$tmp"
+    changed=1
+  fi
+  if (( changed )); then
+    cat "$tmp" >"$file"
+  fi
+  rm -f "$tmp"
+  return $((1 - changed))
+}
+
+sites=$(assemble)
+printf 'assembled %s sites\n' "$sites"
+
+changed=0
+missing=0
+for file in "$HOME/.config/brave-flags.conf" "$HOME/.config/chromium-flags.conf"; do
+  if [[ ! -f $file ]]; then
+    printf 'missing %s\n' "$file"
+    missing=1
+    continue
+  fi
+  if ensure_flags_file "$file" "$ROOT"; then
+    printf 'updated %s\n' "$file"
+    changed=1
+  else
+    printf 'already listed in %s\n' "$file"
+  fi
+done
+
+if (( changed )); then
+  printf 'Restart Brave so it picks up %s\n' "$ROOT"
+elif (( missing )) && (( ! changed )); then
+  printf 'No flags file was updated.\n' >&2
+  exit 1
+fi

@@ -29,5 +29,5 @@ function siteForHost(catalog, hostname) {
 }
 
 if (typeof globalThis !== "undefined") {
-  globalThis.omarchyWebthemeMatch = { siteForHost, hostMatches };
+  globalThis.webThemesMatch = { siteForHost, hostMatches };
 }

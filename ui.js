@@ -16,9 +16,9 @@ const WebthemeUI = {
       const data = await fetch(chrome.runtime.getURL("theme.json") + "?v=" + Date.now(), {
         cache: "reload",
       }).then((response) => (response.ok ? response.json() : null));
-      return data && data.name ? data.name : "Omarchy";
+      return data && data.name ? data.name : "Desktop";
     } catch {
-      return "Omarchy";
+      return "Desktop";
     }
   },
 
@@ -145,7 +145,7 @@ const WebthemeUI = {
         setTimeout(() => this.keepAlive(), 1000);
       });
     } catch {
-      /* service worker may be missing; native fallback still works */
+      /* service worker may be missing */
     }
   },
 
@@ -199,7 +199,7 @@ const WebthemeUI = {
         css = [colors, siteCss].filter(Boolean).join("\n");
       }
       const key = String(Date.now()) + "\n" + (site ? site.id + "\n" + site.css : "");
-      chrome.tabs.sendMessage(tab.id, { type: "omarchy-webtheme-reload", css, key }, () => {
+      chrome.tabs.sendMessage(tab.id, { type: "web-themes-reload", css, key }, () => {
         void chrome.runtime.lastError;
       });
       if (!chrome.scripting || typeof chrome.scripting.executeScript !== "function") continue;
@@ -207,7 +207,7 @@ const WebthemeUI = {
         .executeScript({
           target: { tabId: tab.id },
           func: (nextCss) => {
-            const id = "omarchy-webtheme-style";
+            const id = "web-themes-style";
             let el = document.getElementById(id);
             if (!nextCss) {
               if (el) el.remove();
@@ -226,86 +226,16 @@ const WebthemeUI = {
     }
   },
 
-  callNative(msg) {
-    return new Promise((resolve, reject) => {
-      let port;
-      try {
-        port = chrome.runtime.connectNative("com.evo.webtheme");
-      } catch (err) {
-        reject(err);
-        return;
-      }
-      const id = "ui-" + Date.now() + "-" + Math.random().toString(16).slice(2);
-      let settled = false;
-      const finish = (handler, value) => {
-        if (settled) return;
-        settled = true;
-        clearTimeout(timer);
-        try {
-          port.disconnect();
-        } catch {
-          /* ignore */
-        }
-        handler(value);
-      };
-      const timer = setTimeout(() => finish(reject, new Error("native host timeout")), 12000);
-      port.onMessage.addListener((reply) => {
-        if (!reply || reply.type === "reload") return;
-        if (reply.id && String(reply.id) !== id) return;
-        finish(resolve, reply);
-      });
-      port.onDisconnect.addListener(() => {
-        if (settled) {
-          void chrome.runtime.lastError;
-          return;
-        }
-        const err = chrome.runtime.lastError && chrome.runtime.lastError.message;
-        finish(reject, new Error(err || "native host disconnected"));
-      });
-      try {
-        port.postMessage(Object.assign({ id }, msg));
-      } catch (err) {
-        finish(reject, err);
-      }
-    });
-  },
-
   async call(msg) {
-    try {
-      const reply = await this.callNative(msg);
-      if (reply && reply.ok !== false) {
-        await this.rememberOverlay(msg);
-        this.paintOpenTabs().catch(() => {});
-        if (msg.type === "theme-site") {
-          let host = "site";
-          try {
-            host = msg.url ? new URL(msg.url).hostname : "site";
-          } catch {
-            host = "site";
-          }
-          try {
-            const data = await chrome.storage.session.get("themeJobs");
-            const jobs = (Array.isArray(data.themeJobs) ? data.themeJobs : []).filter((job) => job.host !== host);
-            jobs.push({ host, url: msg.url, title: msg.title || host, startedAt: Date.now() });
-            await chrome.storage.session.set({ themeJobs: jobs });
-          } catch {
-            /* ignore */
-          }
-          if (chrome.notifications && chrome.notifications.create) {
-            chrome.notifications.create("webtheme-theme-" + host, {
-              type: "basic",
-              iconUrl: chrome.runtime.getURL("icon.png"),
-              title: "Theming " + host,
-              message: "The default agent is writing a personal package in the background.",
-              priority: 1,
-            });
-          }
-        }
-      }
-      return reply;
-    } catch (err) {
-      return { ok: false, error: String(err && err.message ? err.message : err) };
+    if (msg.type === "theme-site") {
+      return { ok: false, error: "Add a site package under sites/ and run ./setup" };
     }
+    if (msg.type !== "enabled" && msg.type !== "set-enabled") {
+      return { ok: false, error: "unsupported" };
+    }
+    await this.rememberOverlay(msg);
+    this.paintOpenTabs().catch(() => {});
+    return { ok: true };
   },
 
   row(site, currentId, opts) {
