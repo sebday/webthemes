@@ -1,0 +1,62 @@
+:root {
+    --bg: var(--bg-primary) !important;
+    --fg: var(--text-primary) !important;
+    --card: var(--bg-deep) !important;
+    --muted: var(--text-muted) !important;
+    --line: var(--border-subtle) !important;
+    --sev-critical: var(--red);
+    --sev-high: color-mix(in srgb, var(--red) 50%, var(--orange));
+    --sev-medium: var(--orange);
+    --sev-low: var(--blue);
+    --sev-info: var(--text-muted);
+}
+
+::selection {
+    background: color-mix(in srgb, var(--text-accent) 30%, transparent);
+}
+
+h1,
+h2,
+.card b {
+    color: var(--text-bright);
+}
+
+a,
+code {
+    color: var(--text-accent);
+}
+
+.card {
+    color: inherit !important;
+}
+
+pre {
+    background: var(--bg-primary) !important;
+    color: var(--text-primary);
+}
+
+.f summary:hover,
+.card:hover {
+    background: color-mix(in srgb, var(--bg-secondary) 35%, var(--bg-deep));
+}
+
+.sev {
+    color: var(--bg-deep) !important;
+}
+
+/* The report sets severity colours inline. */
+.sev[style*="#b91c1c"] { background: var(--sev-critical) !important; }
+.sev[style*="#ea580c"] { background: var(--sev-high) !important; }
+.sev[style*="#ca8a04"] { background: var(--sev-medium) !important; }
+.sev[style*="#2563eb"] { background: var(--sev-low) !important; }
+.sev[style*="#6b7280"] { background: var(--sev-info) !important; }
+
+.card[style*="#b91c1c"] { border-color: var(--sev-critical) !important; }
+.card[style*="#ea580c"] { border-color: var(--sev-high) !important; }
+.card[style*="#ca8a04"] { border-color: var(--sev-medium) !important; }
+.card[style*="#2563eb"] { border-color: var(--sev-low) !important; }
+.card[style*="#16a34a"] { border-color: var(--green) !important; }
+
+.bar {
+    background: var(--sev-high) !important;
+}
