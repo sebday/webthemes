@@ -10,7 +10,7 @@ Brave extension that restyles bundled sites with the current desktop palette. Si
 
 That writes `colors.css` and `catalog.json`, then appends this folder to `--load-extension=` in `~/.config/brave-flags.conf` (and Chromium's file if you have one). Fully quit Brave and open it again. An in-app restart keeps the old flags and will not load this.
 
-Run `./setup` again after a theme change, or after adding a package under `sites/<id>/`.
+`evo-theme` runs `./setup sync` after a theme switch, which rewrites `colors.css`, `theme.json`, and `revision`. Open tabs poll that stamp and pick up the new palette. Run `./setup` again after adding a package under `sites/<id>/`.
 
 ## Site package
 

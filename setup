@@ -148,20 +148,35 @@ assemble() {
   jq -n --argjson sites "$catalog_json" '{enabled: true, sites: $sites}' >"$ROOT/catalog.json"
   printf 'true\n' >"$ROOT/enabled"
   date +%s >"$ROOT/revision"
+  sync_theme
+  jq -r '.sites | length' "$ROOT/catalog.json"
+}
 
-  local css name slug
+sync_theme() {
+  local css name slug current_css="" current_name="" changed=0
   if css=$(render_colors_css); then
-    printf '%s\n' "$css" >"$ROOT/colors.css"
+    :
   elif [[ -f $THEME/colors.css ]]; then
-    cp -f "$THEME/colors.css" "$ROOT/colors.css"
+    css=$(<"$THEME/colors.css")
   else
     fail "no theme colours in $THEME"
   fi
   slug=$(tr -d '\n' <"$THEME/.theme-name" 2>/dev/null || true)
   [[ -n $slug ]] || slug=desktop
   name=$(printf '%s' "$slug" | sed -E 's/(^|-)([a-z])/\1\u\2/g; s/-/ /g')
-  jq -n --arg name "$name" '{name:$name}' >"$ROOT/theme.json"
-  jq -r '.sites | length' "$ROOT/catalog.json"
+  [[ -f $ROOT/colors.css ]] && current_css=$(<"$ROOT/colors.css")
+  [[ -f $ROOT/theme.json ]] && current_name=$(jq -r '.name // empty' "$ROOT/theme.json")
+  if [[ $css != "$current_css" ]]; then
+    printf '%s\n' "$css" >"$ROOT/colors.css"
+    changed=1
+  fi
+  if [[ $name != "$current_name" ]]; then
+    jq -n --arg name "$name" '{name:$name}' >"$ROOT/theme.json"
+    changed=1
+  fi
+  if (( changed )) || [[ ! -f $ROOT/revision ]]; then
+    date +%s >"$ROOT/revision"
+  fi
 }
 
 ensure_flags_file() {
@@ -193,6 +208,17 @@ ensure_flags_file() {
   rm -f "$tmp"
   return $((1 - changed))
 }
+
+case ${1:-} in
+  sync)
+    sync_theme
+    exit 0
+    ;;
+  ""|setup) ;;
+  *)
+    fail "unknown command: $1"
+    ;;
+esac
 
 sites=$(assemble)
 printf 'assembled %s sites\n' "$sites"
