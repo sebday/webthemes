@@ -1,0 +1,8 @@
+{
+  "id": "analytics.day.technology",
+  "name": "DayTech analytics",
+  "matches": [
+    "https://analytics.day.technology/*"
+  ],
+  "enabled": true
+}
