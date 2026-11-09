@@ -1,6 +1,0 @@
-{
-  "id": "secmon",
-  "name": "secmon",
-  "matches": ["https://secmon.day.marketing/*"],
-  "enabled": true
-}

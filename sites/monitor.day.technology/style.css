@@ -1,0 +1,24 @@
+:root {
+    --bg: var(--bg-primary) !important;
+    --panel: var(--bg-deep) !important;
+    --ink: var(--text-primary) !important;
+    --head: color-mix(in srgb, var(--bg-primary) 11%, var(--text-primary)) !important;
+    --muted: color-mix(in srgb, var(--text-bright) 39%, var(--text-muted)) !important;
+    --faint: color-mix(in srgb, var(--border) 52%, var(--text-bright)) !important;
+    --line: color-mix(in srgb, var(--bg-primary) 51%, var(--bg-secondary)) !important;
+    --soft: color-mix(in srgb, black 28%, var(--bg-deep)) !important;
+    --accent: color-mix(in srgb, var(--orange) 53%, var(--red)) !important;
+    --accent-soft: color-mix(in srgb, var(--accent) 22%, transparent) !important;
+    --err: var(--red) !important;
+    --err-soft: color-mix(in srgb, var(--red) 16%, transparent) !important;
+    --warn: var(--orange) !important;
+    --warn-soft: color-mix(in srgb, var(--orange) 14%, transparent) !important;
+    --ok: var(--green) !important;
+    --info: var(--blue) !important;
+    --bar: var(--accent) !important;
+    --shadow: none !important;
+}
+
+::selection {
+    background: color-mix(in srgb, var(--text-accent) 30%, transparent);
+}

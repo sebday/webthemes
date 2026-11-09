@@ -1,0 +1,6 @@
+{
+  "id": "monitor.day.technology",
+  "name": "DayTech monitor",
+  "matches": ["https://monitor.day.technology/*"],
+  "enabled": true
+}
