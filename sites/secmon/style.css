@@ -60,3 +60,7 @@ pre {
 .bar {
     background: var(--sev-high) !important;
 }
+
+.logo .bg {
+    fill: var(--sev-high) !important;
+}
