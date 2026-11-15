@@ -1,0 +1,6 @@
+{
+  "id": "shopify",
+  "name": "Shopify Live",
+  "matches": ["https://admin.shopify.com/*"],
+  "enabled": true
+}

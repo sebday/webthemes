@@ -1,0 +1,125 @@
+html:has([aria-label="Map showing live customer activity worldwide"]) {
+    --p-color-bg: var(--bg-primary) !important;
+    --p-color-bg-inverse: var(--bg-deep) !important;
+    --p-color-bg-surface: var(--bg-deep) !important;
+    --p-color-bg-surface-hover: var(--bg-secondary) !important;
+    --p-color-bg-surface-active: var(--bg-secondary) !important;
+    --p-color-bg-surface-selected: var(--bg-secondary) !important;
+    --p-color-bg-surface-secondary: var(--bg-primary) !important;
+    --p-color-bg-surface-secondary-hover: var(--bg-secondary) !important;
+    --p-color-bg-surface-secondary-active: var(--bg-secondary) !important;
+    --p-color-bg-surface-secondary-selected: var(--bg-secondary) !important;
+    --p-color-bg-surface-tertiary: var(--bg-secondary) !important;
+    --p-color-bg-surface-tertiary-hover: var(--bg-secondary) !important;
+    --p-color-bg-surface-tertiary-active: var(--bg-secondary) !important;
+    --p-color-bg-surface-brand: color-mix(in srgb, var(--text-accent) 16%, var(--bg-primary)) !important;
+    --p-color-bg-surface-emphasis: color-mix(in srgb, var(--text-accent) 14%, var(--bg-primary)) !important;
+    --p-color-bg-surface-inverse: var(--bg-deep) !important;
+    --p-color-bg-fill: var(--bg-secondary) !important;
+    --p-color-bg-fill-hover: color-mix(in srgb, var(--text-primary) 10%, var(--bg-secondary)) !important;
+    --p-color-bg-fill-active: color-mix(in srgb, var(--text-primary) 16%, var(--bg-secondary)) !important;
+    --p-color-bg-fill-selected: color-mix(in srgb, var(--text-accent) 24%, var(--bg-primary)) !important;
+    --p-color-bg-fill-secondary: var(--bg-primary) !important;
+    --p-color-bg-fill-secondary-hover: var(--bg-secondary) !important;
+    --p-color-bg-fill-secondary-active: var(--bg-secondary) !important;
+    --p-color-bg-fill-tertiary: var(--bg-deep) !important;
+    --p-color-bg-fill-brand: var(--text-accent) !important;
+    --p-color-bg-fill-brand-hover: color-mix(in srgb, var(--text-accent) 86%, white) !important;
+    --p-color-bg-fill-brand-active: color-mix(in srgb, var(--text-accent) 78%, black) !important;
+    --p-color-bg-fill-brand-selected: color-mix(in srgb, var(--text-accent) 70%, black) !important;
+    --p-color-text: #fff !important;
+    --p-color-text-secondary: #fff !important;
+    --p-color-text-disabled: #fff !important;
+    --p-color-text-link: var(--text-accent) !important;
+    --p-color-text-link-hover: var(--text-accent) !important;
+    --p-color-text-brand: var(--text-accent) !important;
+    --p-color-text-emphasis: var(--text-accent) !important;
+    --p-color-text-inverse: #fff !important;
+    --p-color-text-inverse-secondary: #fff !important;
+    --p-color-border: var(--border-subtle) !important;
+    --p-color-border-hover: var(--border) !important;
+    --p-color-border-secondary: var(--border-subtle) !important;
+    --p-color-border-tertiary: var(--border-subtle) !important;
+    --p-color-border-focus: var(--text-accent) !important;
+    --p-color-border-brand: var(--text-accent) !important;
+    --p-color-icon: var(--text-primary) !important;
+    --p-color-icon-secondary: var(--text-muted) !important;
+    --p-color-icon-brand: var(--text-accent) !important;
+    --p-color-nav-bg: var(--bg-deep) !important;
+
+    &,
+    body,
+    #app,
+    #AppFrame,
+    .Polaris-Frame {
+        background: var(--bg-primary) !important;
+        color: #fff !important;
+        color-scheme: dark;
+        -webkit-text-fill-color: #fff !important;
+    }
+
+    *,
+    *::before,
+    *::after {
+        --p-color-text: #fff !important;
+        --p-color-text-secondary: #fff !important;
+        --p-color-text-disabled: #fff !important;
+        color: #fff !important;
+        -webkit-text-fill-color: #fff !important;
+    }
+
+    s-internal-text,
+    s-internal-paragraph,
+    s-internal-heading,
+    s-text,
+    s-paragraph,
+    s-heading,
+    .Polaris-Text--root,
+    .Polaris-Text--subdued {
+        --p-color-text: #fff !important;
+        --p-color-text-secondary: #fff !important;
+        --p-color-text-disabled: #fff !important;
+        color: #fff !important;
+        -webkit-text-fill-color: #fff !important;
+    }
+
+    .Polaris-Frame__Navigation,
+    .Polaris-TopBar,
+    .Polaris-Frame__TopBar {
+        background: var(--bg-deep) !important;
+    }
+
+    [aria-label="Map showing live customer activity worldwide"],
+    #shop-pin,
+    [class*="_Controls_"][class*="_Raised_"] {
+        display: none !important;
+    }
+
+    :has(> [aria-label="Map showing live customer activity worldwide"]) {
+        flex: 0 1 auto !important;
+        height: auto !important;
+        min-height: 0 !important;
+    }
+
+    @media (max-width: 47.9975em), (height <= 30em) and (pointer: coarse) {
+        [data-admin-next]:where([data-mweb-root-scroller]):not([mobile-bridge]) :where([class*="_notFullScreen_"]) :is([class*="_ScrollbarSafeArea_"], [class*="_ScrollbarSafeAreaFullscreen_"]) {
+            padding-block-end: 0 !important;
+        }
+    }
+
+    [class*="_ToggleContainer_"] {
+        top: 0 !important;
+    }
+
+    s-internal-button[accessibilitylabel*="Sidekick" i],
+    s-internal-button[icon="sidekick"],
+    button[aria-label*="Sidekick" i],
+    s-internal-button[accessibilitylabel="Menu"],
+    s-internal-button[accessibilitylabel="Toggle menu"],
+    s-internal-button[icon="menu"],
+    button[aria-label="Menu"],
+    button[aria-label="Toggle menu"],
+    button[aria-label="Toggle navigation"] {
+        display: none !important;
+    }
+}
