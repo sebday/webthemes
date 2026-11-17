@@ -1,4 +1,4 @@
-:root {
+:root:not([data-theme="light"]) {
     --bg: var(--bg-primary) !important;
     --panel: var(--bg-deep) !important;
     --ink: var(--text-primary) !important;
