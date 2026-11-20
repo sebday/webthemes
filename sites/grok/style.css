@@ -1,32 +1,76 @@
-:root {
-    --background: var(--bg-primary);
+:root[data-desktop-ui],
+:root[data-desktop-ui=dark],
+:root.dark {
+    background-color: var(--bg-primary) !important;
 }
 
-.bg-surface, .bg-surface-base {
-    background: var(--bg-primary) !important;
-    color: var(--text-primary);
+:root.dark,
+:root.dark * {
+    --grok-chrome: var(--bg-deep) !important;
+    --grok-pane: var(--bg-primary) !important;
+    --grok-elevated: var(--bg-secondary) !important;
+    --grok-base: var(--text-primary) !important;
+    --grok-base-wash: var(--text-primary) !important;
+    --grok-accent: var(--text-accent) !important;
+    --grok-on-primary: var(--bg-deep) !important;
+    --grok-bg-chrome: var(--bg-deep) !important;
+    --grok-bg-chat: var(--bg-primary) !important;
+    --grok-bg-sidebar: var(--bg-deep) !important;
+    --grok-bg-pane: var(--bg-primary) !important;
+    --grok-bg-elevated: var(--bg-secondary) !important;
+    --grok-text-primary: var(--text-primary) !important;
+    --grok-text-secondary: var(--text-muted) !important;
+    --grok-text-on-primary: var(--bg-deep) !important;
+    --grok-text-inverted: var(--bg-deep) !important;
+    --grok-border-primary: var(--border) !important;
+    --grok-border-secondary: var(--border-subtle) !important;
+    --grok-glass-fill: color-mix(in srgb, var(--bg-primary) 72%, transparent) !important;
+    --grok-glass-fill-hover: color-mix(in srgb, var(--bg-secondary) 80%, transparent) !important;
+    --grok-glass-fill-active: color-mix(in srgb, var(--bg-secondary) 88%, transparent) !important;
 }
 
-.from-surface, 
-.from-surface-base {
-    --tw-gradient-from: none;
-    --tw-gradient-to: none;
-    --tw-gradient-stops: none;
+:root.dark body,
+:root[data-desktop-ui=dark] body {
+    color: var(--text-primary) !important;
 }
 
-.via-background {
-  --tw-gradient-stops: var(--bg-secondary),var(--bg-primary) var(--tw-gradient-via-position),var(--tw-gradient-to);
-}
-
-.bg-background ,
-.bg-surface-l1 {
-  background: var(--bg-primary) !important;
-}
-
-.bg-surface-l2 {
-  background: var(--bg-secondary) !important;
-}
-
-.border-border, .border-border-l1 {
-  border-color: var(--bg-primary) !important;
+:root.dark body,
+:root.dark body *,
+:root[data-desktop-ui=dark] body,
+:root[data-desktop-ui=dark] body * {
+    --surface-base: var(--bg-primary) !important;
+    --surface-inset: var(--bg-deep) !important;
+    --surface-l1: var(--bg-deep) !important;
+    --surface-l1-hover: var(--bg-secondary) !important;
+    --surface-l2: var(--bg-secondary) !important;
+    --surface-l2-active: var(--bg-secondary) !important;
+    --surface-l3: var(--bg-secondary) !important;
+    --surface-l4: var(--bg-secondary) !important;
+    --surface-elevated: var(--bg-secondary) !important;
+    --surface-user-bubble: var(--bg-secondary) !important;
+    --surface-composer: var(--bg-secondary) !important;
+    --popover: var(--bg-secondary) !important;
+    --background: var(--bg-primary) !important;
+    --background-color: var(--bg-primary) !important;
+    --color-surface-base: var(--bg-primary) !important;
+    --fg-primary: var(--text-primary) !important;
+    --color-fg-primary: var(--text-primary) !important;
+    --fg-secondary: var(--text-muted) !important;
+    --color-fg-secondary: var(--text-muted) !important;
+    --fg-tertiary: var(--text-muted) !important;
+    --fg-invert: var(--bg-deep) !important;
+    --fg-accent: var(--text-accent) !important;
+    --fg-accent-hover: var(--text-accent) !important;
+    --border-l1: color-mix(in srgb, var(--text-primary) 14%, transparent) !important;
+    --border-l2: color-mix(in srgb, var(--text-primary) 22%, transparent) !important;
+    --border-composer: color-mix(in srgb, var(--text-primary) 14%, transparent) !important;
+    --input: var(--bg-secondary) !important;
+    --input-background: var(--bg-secondary) !important;
+    --input-hover: var(--bg-secondary) !important;
+    --input-button-background: var(--bg-secondary) !important;
+    --input-button-background-hover: var(--bg-secondary) !important;
+    --sidebar-accent: var(--bg-secondary) !important;
+    --sidebar-border: var(--border-subtle) !important;
+    --sidebar-foreground: var(--text-primary) !important;
+    --sidebar-accent-foreground: var(--text-primary) !important;
 }
